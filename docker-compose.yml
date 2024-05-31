@@ -1,0 +1,33 @@
+version: '3.8'
+services:
+  database:
+    image: mongo:6.0
+    container_name: mongodb
+    restart: always
+    ports:
+      - '${DATABASE_PORT}:27017'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${DATABASE_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${DATABASE_PASS}
+    networks:
+      - term-tracker-network
+
+  app:
+    container_name: term-tracker-application
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+      DATABASE_HOST: database
+    ports:
+      - '${PORT}:3000'
+    depends_on:
+      - database
+    networks:
+      - term-tracker-network
+
+networks:
+  term-tracker-network:
+    driver: bridge
