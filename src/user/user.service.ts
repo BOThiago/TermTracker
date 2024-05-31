@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from './schema/user.schema';
@@ -63,6 +68,8 @@ export class UserService {
       user.favorites.push(favoriteWord);
       await user.save();
     }
+
+    return favoriteWord;
   }
 
   async removeFavorite(word: string, userId: string) {
@@ -71,9 +78,16 @@ export class UserService {
       .slice(0)
       .findIndex((item) => item.word === word);
 
+    if (index <= -1) throw new BadRequestException('Word is not favorited');
+
     if (index !== -1) {
       user.favorites.splice(index, 1);
       await user.save();
     }
+
+    throw new HttpException(
+      'Word removed from favorites',
+      HttpStatus.NO_CONTENT,
+    );
   }
 }
