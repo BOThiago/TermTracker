@@ -9,6 +9,7 @@ import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { WordService } from './word/word.service';
 import { WordModule } from './word/word.module';
+import { EntriesModule } from './entries/entries.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { WordModule } from './word/word.module';
     AuthModule,
     UserModule,
     WordModule,
+    EntriesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

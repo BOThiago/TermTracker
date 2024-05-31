@@ -42,7 +42,7 @@ export class EntriesController {
     @Param('word') word: string,
     @UsuarioIdParam('userId') userId: string,
   ) {
-    return this.entriesService.addFavorite(word, userId);
+    return await this.entriesService.addFavorite(word, userId);
   }
 
   @Delete(':word/unfavorite')
@@ -50,6 +50,6 @@ export class EntriesController {
     @Param('word') word: string,
     @UsuarioIdParam('userId') userId: string,
   ) {
-    return this.entriesService.removeFavorite(word, userId);
+    return await this.entriesService.removeFavorite(word, userId);
   }
 }
