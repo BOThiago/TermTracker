@@ -13,7 +13,7 @@ import { UserModule } from '../user/user.module';
     UserModule,
     JwtModule.register({
       secret: 'secretKey',
-      signOptions: { expiresIn: '60m' },
+      signOptions: { expiresIn: '6h' },
     }),
   ],
   providers: [AuthService, JwtStrategy],
