@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from './schema/user.schema';
@@ -35,5 +35,45 @@ export class UserService {
       .findById(userId)
       .select('favorites');
     return favorites;
+  }
+
+  async addToHistory(word: string, userId: string) {
+    const user = await this.userModel.findById(userId);
+    const added = new Date();
+    const historyWord = { word, added };
+
+    if (!user.history.includes(historyWord)) {
+      user.history.push(historyWord);
+      await user.save();
+    }
+  }
+
+  async addToFavorites(word: string, userId: string) {
+    const user = await this.userModel.findById(userId);
+    const added = new Date();
+    const favoriteWord = { word, added };
+
+    const isAlreadyFavorited = user.favorites.some(
+      (favorite) => favorite.word === word,
+    );
+    if (isAlreadyFavorited)
+      throw new BadRequestException('Word is already favorited');
+
+    if (!user.favorites.includes(favoriteWord)) {
+      user.favorites.push(favoriteWord);
+      await user.save();
+    }
+  }
+
+  async removeFavorite(word: string, userId: string) {
+    const user = await this.userModel.findById(userId);
+    const index = user.favorites
+      .slice(0)
+      .findIndex((item) => item.word === word);
+
+    if (index !== -1) {
+      user.favorites.splice(index, 1);
+      await user.save();
+    }
   }
 }

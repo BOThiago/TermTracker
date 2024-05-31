@@ -10,6 +10,7 @@ import { UserModule } from '../user/user.module';
   imports: [
     forwardRef(() => UserModule),
     PassportModule,
+    UserModule,
     JwtModule.register({
       secret: 'secretKey',
       signOptions: { expiresIn: '60m' },
