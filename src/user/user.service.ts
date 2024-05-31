@@ -8,6 +8,10 @@ import { UserDto } from './dto/user.dto';
 export class UserService {
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
+  async findById(id: string) {
+    return this.userModel.findById(id);
+  }
+
   async create(user: UserDto) {
     const newUser = new this.userModel(user);
     return newUser.save();
