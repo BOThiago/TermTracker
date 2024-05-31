@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, OnModuleInit } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
 import { CacheModule } from '@nestjs/cache-manager';
@@ -7,6 +7,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
+import { WordService } from './word/word.service';
+import { WordModule } from './word/word.module';
 
 @Module({
   imports: [
@@ -27,11 +29,21 @@ import { UserModule } from './user/user.module';
       inject: [ConfigService],
     }),
     CacheModule.register(),
-    HttpModule,
+    HttpModule.register({
+      timeout: 5000,
+      maxRedirects: 5,
+    }),
     AuthModule,
     UserModule,
+    WordModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements OnModuleInit {
+  constructor(private readonly wordsService: WordService) {}
+
+  onModuleInit() {
+    this.wordsService.getAllWords();
+  }
+}
