@@ -35,22 +35,18 @@ export class AuthService {
       const token = this.jwtService.sign({ userId: user._id });
       return { id: user._id, name: user.name, token: `Bearer ${token}` };
     } catch (error) {
-      throw new Error('Failed to register user.');
+      throw new BadRequestException({ message: 'Failed to register user.' });
     }
   }
 
   async signin(credentials: SigninDto) {
-    try {
-      const user = await this.userService.findByEmail(credentials.email);
-      if (user && (await bcrypt.compare(credentials.password, user.password))) {
-        const token = this.jwtService.sign({ userId: user._id });
-        return { id: user._id, name: user.name, token: `Bearer ${token}` };
-      }
-      throw new UnauthorizedException({
-        message: 'user or password incorrect.',
-      });
-    } catch (error) {
-      throw new Error('Failed to login user.');
+    const user = await this.userService.findByEmail(credentials.email);
+    if (user && (await bcrypt.compare(credentials.password, user.password))) {
+      const token = this.jwtService.sign({ userId: user._id });
+      return { id: user._id, name: user.name, token: `Bearer ${token}` };
     }
+    throw new UnauthorizedException({
+      message: 'user or password incorrect.',
+    });
   }
 }
