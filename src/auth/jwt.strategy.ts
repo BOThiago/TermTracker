@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { UserService } from '../user/user.service';
@@ -18,7 +18,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       const user = await this.userService.findById(payload.userId);
       return { userId: user._id, name: user.name, email: user.email };
     } catch (error) {
-      throw new Error('Failed to validate user session.');
+      throw new UnauthorizedException('Failed to validate user session.');
     }
   }
 }
