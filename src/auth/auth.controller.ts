@@ -9,11 +9,11 @@ export class AuthController {
 
   @Post('signup')
   async signup(@Body() credentials: SignupDto) {
-    return this.authService.signup(credentials);
+    return await this.authService.signup(credentials);
   }
 
   @Post('signin')
   async signin(@Body() credentials: SigninDto) {
-    return this.authService.signin(credentials);
+    return await this.authService.signin(credentials);
   }
 }

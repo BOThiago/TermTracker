@@ -14,7 +14,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
-    const user = await this.userService.findById(payload.userId);
-    return { userId: user._id, name: user.name, email: user.email };
+    try {
+      const user = await this.userService.findById(payload.userId);
+      return { userId: user._id, name: user.name, email: user.email };
+    } catch (error) {
+      throw new Error('Failed to validate user session.');
+    }
   }
 }

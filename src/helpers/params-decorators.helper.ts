@@ -15,7 +15,6 @@ export const WordAndUserIdParam = createParamDecorator(
   (_: unknown, ctx: ExecutionContext): object => {
     const request = ctx.switchToHttp().getRequest();
 
-    console.log(request['_parsedUrl']['query']);
     if (request['user'] && request['params']['word']) {
       return {
         userId: String(request['user']?.userId),
