@@ -17,30 +17,40 @@ export class AuthService {
   ) {}
 
   async signup(credentials: SignupDto) {
-    const existingUser = await this.userService.findByEmail(credentials.email);
-    if (existingUser)
-      throw new BadRequestException({ message: 'E-mail already in use' });
+    try {
+      const existingUser = await this.userService.findByEmail(
+        credentials.email,
+      );
+      if (existingUser)
+        throw new BadRequestException({ message: 'E-mail already in use' });
 
-    const hashedPassword = await bcrypt.hash(credentials.password, 10);
+      const hashedPassword = await bcrypt.hash(credentials.password, 10);
 
-    const user = await this.userService.create({
-      name: credentials.name,
-      email: credentials.email,
-      password: hashedPassword,
-    });
+      const user = await this.userService.create({
+        name: credentials.name,
+        email: credentials.email,
+        password: hashedPassword,
+      });
 
-    const token = this.jwtService.sign({ userId: user._id });
-    return { id: user._id, name: user.name, token: `Bearer ${token}` };
+      const token = this.jwtService.sign({ userId: user._id });
+      return { id: user._id, name: user.name, token: `Bearer ${token}` };
+    } catch (error) {
+      throw new Error('Failed to register user.');
+    }
   }
 
   async signin(credentials: SigninDto) {
-    const user = await this.userService.findByEmail(credentials.email);
-    if (user && (await bcrypt.compare(credentials.password, user.password))) {
-      const token = this.jwtService.sign({ userId: user._id });
-      return { id: user._id, name: user.name, token: `Bearer ${token}` };
+    try {
+      const user = await this.userService.findByEmail(credentials.email);
+      if (user && (await bcrypt.compare(credentials.password, user.password))) {
+        const token = this.jwtService.sign({ userId: user._id });
+        return { id: user._id, name: user.name, token: `Bearer ${token}` };
+      }
+      throw new UnauthorizedException({
+        message: 'user or password incorrect.',
+      });
+    } catch (error) {
+      throw new Error('Failed to login user.');
     }
-    throw new UnauthorizedException({
-      message: 'user or password incorrect.',
-    });
   }
 }

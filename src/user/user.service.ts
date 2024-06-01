@@ -14,20 +14,19 @@ export class UserService {
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
   async findById(id: string) {
-    return this.userModel.findById(id);
+    return await this.userModel.findById(id);
   }
 
   async create(user: UserDto) {
-    const newUser = new this.userModel(user);
-    return newUser.save();
+    return await new this.userModel(user).save();
   }
 
   async findByEmail(email: string) {
-    return this.userModel.findOne({ email });
+    return await this.userModel.findOne({ email });
   }
 
   async getUserProfile(userId: string) {
-    return this.userModel.findById(userId).select('-password');
+    return await this.userModel.findById(userId).select('-password');
   }
 
   async getUserHistory(userId: string) {
@@ -43,13 +42,17 @@ export class UserService {
   }
 
   async addToHistory(word: string, userId: string) {
-    const user = await this.userModel.findById(userId);
-    const added = new Date();
-    const historyWord = { word, added };
+    try {
+      const user = await this.userModel.findById(userId);
+      const added = new Date();
+      const historyWord = { word, added };
 
-    if (!user.history.includes(historyWord)) {
-      user.history.push(historyWord);
-      await user.save();
+      if (!user.history.includes(historyWord)) {
+        user.history.push(historyWord);
+        await user.save();
+      }
+    } catch (error) {
+      console.error('Something went wrong while adding word to history.');
     }
   }
 
@@ -62,7 +65,7 @@ export class UserService {
       (favorite) => favorite.word === word,
     );
     if (isAlreadyFavorited)
-      throw new BadRequestException('Word is already favorited');
+      throw new BadRequestException('Word is already favorited.');
 
     if (!user.favorites.includes(favoriteWord)) {
       user.favorites.push(favoriteWord);

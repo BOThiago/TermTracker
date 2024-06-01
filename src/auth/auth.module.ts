@@ -10,14 +10,13 @@ import { UserModule } from '../user/user.module';
   imports: [
     forwardRef(() => UserModule),
     PassportModule,
-    UserModule,
     JwtModule.register({
       secret: 'secretKey',
-      signOptions: { expiresIn: '6h' },
+      signOptions: { expiresIn: '72h' },
     }),
   ],
   providers: [AuthService, JwtStrategy],
   controllers: [AuthController],
-  exports: [AuthService, JwtModule],
+  exports: [AuthService, JwtModule, PassportModule],
 })
 export class AuthModule {}
