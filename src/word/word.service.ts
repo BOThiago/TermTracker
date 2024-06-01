@@ -1,9 +1,11 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { firstValueFrom } from 'rxjs';
 import { Word } from './schema/words.schema';
 import { Model } from 'mongoose';
+import { PaginatedResult } from '../helpers/interfaces/paginatedResult.interface';
+import { getPaginationInfo } from '../helpers/pagination.helper';
 
 @Injectable()
 export class WordService {
@@ -37,29 +39,51 @@ export class WordService {
     }
   }
 
-  async getWords(search?: string, page: number = 0, limit: number = 10) {
-    let query = {};
-    if (search) query = { word: { $regex: `^${search}`, $options: 'i' } };
+  async getWords(
+    search: string,
+    page = 0,
+    perPage = 10,
+  ): Promise<PaginatedResult<string[]>> {
+    const query = search
+      ? { word: { $regex: `^${search}`, $options: 'i' } }
+      : {};
 
-    const searchedWords = await this.wordModel
-      .find(query)
-      .select('word')
-      .limit(limit)
-      .skip(page * limit)
-      .exec();
+    const [searchedWords, totalDocs] = await Promise.all([
+      this.wordModel
+        .find(query)
+        .select('word')
+        .limit(perPage)
+        .skip(page * perPage)
+        .exec(),
+      this.countWords(query),
+    ]);
 
-    const totalDocs = await this.countWords(query);
-    const pages = Math.ceil(totalDocs / limit);
+    if (!searchedWords)
+      throw new BadRequestException({
+        message: 'Failed to search for words.',
+      });
 
-    return {
-      results: [searchedWords.map((word) => word.word)],
-      totalDocs: totalDocs,
-      perPage: Number(limit),
-      page: Number(page) + 1,
-      totalPages: pages,
-      hasNext: page + 1 < pages,
-      hasPrev: page > 0,
-    };
+    if (!totalDocs)
+      throw new BadRequestException({
+        message: 'Failed to search for the number of words.',
+      });
+
+    const results = [searchedWords.map((word) => word.word)];
+    const { totalPages, hasNext, hasPrev } = getPaginationInfo(
+      totalDocs,
+      page,
+      perPage,
+    );
+
+    return PaginatedResult.createPagination({
+      results,
+      totalDocs,
+      perPage,
+      page,
+      totalPages,
+      hasNext,
+      hasPrev,
+    });
   }
 
   async countWords(query?: any) {
