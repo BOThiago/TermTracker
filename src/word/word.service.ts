@@ -8,7 +8,7 @@ import { Model } from 'mongoose';
 @Injectable()
 export class WordService {
   constructor(
-    @InjectModel(Word.name) private wordModel: Model<Word>,
+    @InjectModel(Word.name) private readonly wordModel: Model<Word>,
     private readonly httpService: HttpService,
   ) {}
 
@@ -20,14 +20,14 @@ export class WordService {
 
       const url =
         'https://raw.githubusercontent.com/dwyl/english-words/master/words_dictionary.json';
-      const response = await firstValueFrom(this.httpService.get(url));
+      const { data: words } = await firstValueFrom(this.httpService.get(url));
 
-      if (existingWords >= Object.keys(response.data).length) {
+      if (existingWords >= Object.keys(words).length) {
         console.log('Words are already imported!');
         return;
       }
 
-      const wordArray = Object.keys(response.data).map((word) => ({ word }));
+      const wordArray = Object.keys(words).map((word) => ({ word }));
 
       console.log('Inserting all words into database ⚒');
       await this.wordModel.insertMany(wordArray);
