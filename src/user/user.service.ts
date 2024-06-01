@@ -57,48 +57,40 @@ export class UserService {
   }
 
   async addToFavorites(word: string, userId: string) {
-    try {
-      const user = await this.userModel.findById(userId);
-      const added = new Date();
-      const favoriteWord = { word, added };
+    const user = await this.userModel.findById(userId);
+    const added = new Date();
+    const favoriteWord = { word, added };
 
-      const isAlreadyFavorited = user.favorites.some(
-        (favorite) => favorite.word === word,
-      );
-      if (isAlreadyFavorited)
-        throw new BadRequestException('Word is already favorited.');
+    const isAlreadyFavorited = user.favorites.some(
+      (favorite) => favorite.word === word,
+    );
+    if (isAlreadyFavorited)
+      throw new BadRequestException('Word is already favorited.');
 
-      if (!user.favorites.includes(favoriteWord)) {
-        user.favorites.push(favoriteWord);
-        await user.save();
-      }
-
-      return favoriteWord;
-    } catch (error) {
-      console.error('Failed to add word to history.');
+    if (!user.favorites.includes(favoriteWord)) {
+      user.favorites.push(favoriteWord);
+      await user.save();
     }
+
+    return favoriteWord;
   }
 
   async removeFavorite(word: string, userId: string) {
-    try {
-      const user = await this.userModel.findById(userId);
-      const index = user.favorites
-        .slice(0)
-        .findIndex((item) => item.word === word);
+    const user = await this.userModel.findById(userId);
+    const index = user.favorites
+      .slice(0)
+      .findIndex((item) => item.word === word);
 
-      if (index <= -1) throw new BadRequestException('Word is not favorited');
+    if (index <= -1) throw new BadRequestException('Word is not favorited');
 
-      if (index !== -1) {
-        user.favorites.splice(index, 1);
-        await user.save();
-      }
-
-      throw new HttpException(
-        'Word removed from favorites',
-        HttpStatus.NO_CONTENT,
-      );
-    } catch (error) {
-      console.error('Failed to remove word from history.');
+    if (index !== -1) {
+      user.favorites.splice(index, 1);
+      await user.save();
     }
+
+    throw new HttpException(
+      'Word removed from favorites',
+      HttpStatus.NO_CONTENT,
+    );
   }
 }
