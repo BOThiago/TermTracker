@@ -10,6 +10,8 @@ COPY . .
 
 RUN npm run build
 
-EXPOSE 3000
+RUN apk add --no-cache iputils busybox-extras
+
+EXPOSE $PORT
 
 CMD ["node", "dist/main"]

@@ -1,10 +1,12 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, UseGuards, UseInterceptors } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { UserService } from './user.service';
 import { UsuarioIdParam } from '../helpers/params-decorators.helper';
+import { CustomCacheInterceptor } from '../helpers/cacheHeader.interceptor';
 
 @Controller('user/me')
 @UseGuards(JwtAuthGuard)
+@UseInterceptors(CustomCacheInterceptor)
 export class UserController {
   constructor(private userService: UserService) {}
 

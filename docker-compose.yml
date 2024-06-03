@@ -2,29 +2,62 @@ version: '3.8'
 services:
   database:
     image: mongo:6.0
-    container_name: mongodb
+    container_name: database
     restart: always
     ports:
-      - '${DATABASE_PORT}:27017'
+      - ${DATABASE_PORT}:${DATABASE_PORT}
+    command: --port ${DATABASE_PORT}
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${DATABASE_USER}
       MONGO_INITDB_ROOT_PASSWORD: ${DATABASE_PASS}
     networks:
       - term-tracker-network
 
+  redis:
+    image: redis:6.0
+    container_name: redis
+    command: --port ${REDIS_PORT}
+    ports:
+      - ${REDIS_PORT}:${REDIS_PORT}
+    networks:
+      - term-tracker-network
+
+  redis-commander:
+    container_name: redis-commander
+    hostname: redis-commander
+    image: ghcr.io/joeferner/redis-commander:latest
+    environment:
+      - REDIS_HOSTS=local:redis:${REDIS_PORT}
+    ports:
+      - '8081:8081'
+    networks:
+      - term-tracker-network
+    depends_on:
+      - redis
+
   app:
-    container_name: term-tracker-application
+    container_name: api-term-tracker
     build:
       context: ./
       dockerfile: Dockerfile
     env_file:
       - .env
     environment:
-      DATABASE_HOST: database
+      - DATABASE_NAME=${DATABASE_NAME}
+      - DATABASE_HOST=database
+      - DATABASE_PORT=${DATABASE_PORT}
+      - DATABASE_USER=${DATABASE_USER}
+      - DATABASE_PASS=${DATABASE_PASS}
+      - REDIS_HOST=redis
+      - REDIS_PORT=${REDIS_PORT}
+      - JWT_SECRET=${JWT_SECRET}
+      - PORT=${PORT}
     ports:
-      - '${PORT}:3000'
+      - ${PORT}:${PORT}
     depends_on:
       - database
+      - redis
+      - redis-commander
     networks:
       - term-tracker-network
 
