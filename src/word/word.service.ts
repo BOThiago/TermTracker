@@ -1,5 +1,5 @@
 import { HttpService } from '@nestjs/axios';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { firstValueFrom } from 'rxjs';
 import { Word } from './schema/words.schema';
@@ -7,11 +7,16 @@ import { Model } from 'mongoose';
 import { PaginatedResult } from '../helpers/interfaces/paginatedResult.interface';
 import { getPaginationInfo } from '../helpers/pagination.helper';
 import { UserService } from '../user/user.service';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
+import { Request } from 'express';
+import { generateCacheKey } from '../helpers/generateCacheKey.helper';
 
 @Injectable()
 export class WordService {
   constructor(
     @InjectModel(Word.name) private readonly wordModel: Model<Word>,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private readonly userService: UserService,
     private readonly httpService: HttpService,
   ) {}
@@ -34,27 +39,41 @@ export class WordService {
     }
   }
 
-  async findOne(word: string, userId: string) {
+  async findOne(
+    word: string,
+    userId: string,
+    request: Request,
+  ): Promise<Word[]> {
     try {
-      const { data: fullWordData, status } = await this.httpService.axiosRef
-        .get(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`)
-        .catch((error) => {
-          throw new BadRequestException({
-            message: error.response.data.message,
+      const cacheKey = generateCacheKey(request);
+
+      let fullWordData: Word[] = await this.cacheManager.get(cacheKey);
+
+      if (!fullWordData) {
+        const { data, status } = await this.httpService.axiosRef
+          .get(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`)
+          .catch((error) => {
+            throw new BadRequestException({
+              message:
+                error.response?.data?.message || 'Failed to fetch word data',
+            });
           });
-        });
 
-      if (status !== 200)
-        throw new BadRequestException({
-          message: fullWordData.message,
-        });
+        if (status !== 200)
+          throw new BadRequestException({
+            message: data.message,
+          });
 
-      this.updateNewWord(word, fullWordData);
-      this.userService.addToHistory(word, userId);
+        fullWordData = data;
+        await this.cacheManager.set(cacheKey, fullWordData, 60 * 60 * 24);
+      }
+
+      this.updateNewWord(cacheKey, fullWordData);
+      this.userService.addToHistory(cacheKey, userId);
       return fullWordData;
     } catch (error) {
       throw new BadRequestException({
-        message: 'Something went wrong when searching for word.',
+        message: 'Something went wrong when searching for the word.',
       });
     }
   }
@@ -91,9 +110,15 @@ export class WordService {
 
       const existingWords = await this.countWords();
 
-      const url =
-        'https://raw.githubusercontent.com/dwyl/english-words/master/words_dictionary.json';
-      const { data: words } = await firstValueFrom(this.httpService.get(url));
+      let words: Word[] = await this.cacheManager.get('allWords');
+
+      if (!words) {
+        const url =
+          'https://raw.githubusercontent.com/dwyl/english-words/master/words_dictionary.json';
+        const { data } = await firstValueFrom(this.httpService.get(url));
+        await this.cacheManager.set('allWords', data, 3000);
+        words = await this.cacheManager.get('allWords');
+      }
 
       if (existingWords >= Object.keys(words).length) return;
 

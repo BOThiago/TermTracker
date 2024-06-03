@@ -9,6 +9,9 @@ import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { WordService } from './word/word.service';
 import { WordModule } from './word/word.module';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { CustomCacheInterceptor } from './helpers/cacheHeader.interceptor';
+import { redisStore } from 'cache-manager-redis-store';
 
 @Module({
   imports: [
@@ -28,7 +31,19 @@ import { WordModule } from './word/word.module';
       }),
       inject: [ConfigService],
     }),
-    CacheModule.register(),
+    CacheModule.registerAsync({
+      imports: [ConfigModule],
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
+      useFactory: async (configService: ConfigService) => ({
+        ttl: 60,
+        store: redisStore,
+        host: configService.get('REDIS_HOST'),
+        port: configService.get('REDIS_PORT'),
+      }),
+      inject: [ConfigService],
+      isGlobal: true,
+    }),
     HttpModule.register({
       timeout: 5000,
       maxRedirects: 5,
@@ -38,7 +53,14 @@ import { WordModule } from './word/word.module';
     WordModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    WordService,
+    AppService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: CustomCacheInterceptor,
+    },
+  ],
 })
 export class AppModule implements OnModuleInit {
   constructor(private readonly wordsService: WordService) {}
