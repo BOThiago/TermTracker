@@ -17,31 +17,31 @@ export class AuthService {
   ) {}
 
   async signup(credentials: SignupDto) {
-    try {
-      const existingUser = await this.userService.findByEmail(
-        credentials.email,
-      );
-      if (existingUser)
-        throw new BadRequestException({ message: 'E-mail already in use' });
-
-      const hashedPassword = await bcrypt.hash(credentials.password, 10);
-
-      const user = await this.userService.create({
-        name: credentials.name,
-        email: credentials.email,
-        password: hashedPassword,
+    if (!credentials.name || !credentials.email || !credentials.password)
+      throw new BadRequestException({
+        message: 'Credentials, name, email and password must be filled in',
       });
 
-      const token = this.jwtService.sign({ userId: user._id });
-      return { id: user._id, name: user.name, token: `Bearer ${token}` };
-    } catch (error) {
-      throw new BadRequestException({ message: 'Failed to register user.' });
-    }
+    const existingUser = await this.userService.findByEmail(credentials.email);
+
+    if (existingUser)
+      throw new BadRequestException({ message: 'E-mail already in use' });
+
+    const hashedPassword = await bcrypt.hash(credentials.password, 10);
+
+    const user = await this.userService.create({
+      name: credentials.name,
+      email: credentials.email,
+      password: hashedPassword,
+    });
+
+    const token = this.jwtService.sign({ userId: user._id });
+    return { id: user._id, name: user.name, token: `Bearer ${token}` };
   }
 
   async signin(credentials: SigninDto) {
     const user = await this.userService.findByEmail(credentials.email);
-    if (user && (await bcrypt.compare(credentials.password, user.password))) {
+    if (user && bcrypt.compareSync(credentials.password, user.password)) {
       const token = this.jwtService.sign({ userId: user._id });
       return { id: user._id, name: user.name, token: `Bearer ${token}` };
     }
