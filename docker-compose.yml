@@ -48,7 +48,7 @@ services:
       - DATABASE_PORT=${DATABASE_PORT}
       - DATABASE_USER=${DATABASE_USER}
       - DATABASE_PASS=${DATABASE_PASS}
-      - REDIS_HOST=redis
+      - REDIS_HOST=localhost
       - REDIS_PORT=${REDIS_PORT}
       - JWT_SECRET=${JWT_SECRET}
       - PORT=${PORT}

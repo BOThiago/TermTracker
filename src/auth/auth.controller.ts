@@ -2,7 +2,9 @@ import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignupDto } from './dto/signup.dto';
 import { SigninDto } from './dto/signin.dto';
+import { CacheTTL } from '@nestjs/cache-manager';
 
+@CacheTTL(0)
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}

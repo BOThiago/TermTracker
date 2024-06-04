@@ -31,10 +31,9 @@ import { redisStore } from 'cache-manager-redis-store';
       }),
       inject: [ConfigService],
     }),
-    CacheModule.registerAsync({
+    CacheModule.register({
       imports: [ConfigModule],
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-expect-error
       useFactory: async (configService: ConfigService) => ({
         ttl: 60,
         store: redisStore,
