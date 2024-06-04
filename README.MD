@@ -2,7 +2,7 @@
 
 - **1. Descrição do Projeto**
 
-  O Fullstack Challenge - Dictionary é uma API Restful construída com as melhores práticas de desenvolvimento, utilizando as tecnologias NestJS, Class Validator, MongoDB, Mongoose, Redis e JWT. A API oferece funcionalidades para gerenciamento de usuários, autenticação, consulta de palavras em um dicionário, favoritos e histórico de acessos.
+  Term-Tracker é uma API Restful construída com as melhores práticas de desenvolvimento, utilizando as tecnologias TypeScript e NodeJS, juntamente com o framework NestJS, Class Validator, MongoDB, Mongoose, Redis e JWT. A API oferece funcionalidades para gerenciamento de usuários, autenticação, consulta de palavras em um dicionário, favoritos e histórico de palvras acessadas.
 
 - **2. Tecnologias Utilizadas**
 
@@ -20,7 +20,7 @@
 
   `Autenticação:` JWT
 
-  `Documentação:` Open API 3.0
+  `Documentação:` Open API 3.0 e SwaggerUI
 
 - **3. Instalação e Uso**
 
@@ -68,18 +68,43 @@
   - **4.1 Autenticação**
 
     - **[POST] /auth/signup**
-      _ **Descrição:** Cadastra um novo usuário.
-      _ **Requisição:**
+
+      **Descrição:** Cadastra um novo usuário.
+
+      **Requisição:**
 
       ```json
       {
-        "name": "User 1",
+        "name": "Jhon Doe",
+        "email": "jhondoe@email.com",
+        "password": "123456"
+      }
+      ```
+
+      **Resposta:**
+
+      ```json
+      {
+        "id": "f3a10cec013ab2c1380acef",
+        "name": "Jhon Doe",
+        "token": "Bearer JWT.Token"
+      }
+      ```
+
+    - **[POST] /auth/signin**
+
+      **Descrição:** Autentica um usuário existente.
+
+      **Requisição:**
+
+      ```json
+      {
         "email": "example@email.com",
         "password": "test"
       }
       ```
 
-      \_ **Resposta:**
+      **Resposta:**
 
       ```json
       {
@@ -89,36 +114,19 @@
       }
       ```
 
-    - **[POST] /auth/signin**
-      _ \*\*Descrição: Autentica um usuário existente.
-      _ **Requisição:**
-
-    ```json
-    {
-      "email": "example@email.com",
-      "password": "test"
-    }
-    ```
-
-    \_ **Resposta:**
-
-    ```json
-    {
-      "id": "f3a10cec013ab2c1380acef",
-      "name": "User 1",
-      "token": "Bearer JWT.Token"
-    }
-    ```
-
   - **4.2 Dicionário**
 
     - **[GET] /entries/en**
-      _ \*\*Descrição: Lista as palavras do dicionário, com paginação e suporte a busca.
-      _ **Parâmetros:**
-      _ search: Termo de busca (opcional).
-      _ limit: Quantidade de resultados por página (opcional, padrão 10).
-      _ page: Página a ser exibida (opcional, padrão 1).
-      _ **Resposta:**
+
+      **Descrição:** Lista as palavras do dicionário, com paginação e suporte a busca.
+
+      **Parâmetros:**
+
+      - `search`: Termo de busca (opcional).
+      - `limit`: Quantidade de resultados por página (opcional, padrão 10).
+      - `page`: Página a ser exibida (opcional, padrão 1).
+
+      **Resposta:**
 
       ```json
       {
