@@ -35,7 +35,7 @@ import { redisStore } from 'cache-manager-redis-store';
       imports: [ConfigModule],
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       useFactory: async (configService: ConfigService) => ({
-        ttl: 60,
+        ttl: 10,
         store: redisStore,
         host: configService.get('REDIS_HOST'),
         port: configService.get('REDIS_PORT'),
