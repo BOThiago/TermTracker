@@ -1,4 +1,4 @@
-# README - Fullstack Challenge - Term-Tracker-API
+# README - Backend Challenge - Term-Tracker-API
 
 - **1. Descrição do Projeto**
 
@@ -10,8 +10,6 @@
 
   `Framework:` NestJS
 
-  `Validação:` Class Validator
-
   `Banco de Dados:` MongoDB
 
   `ORM:` Mongoose
@@ -19,6 +17,8 @@
   `Cache:` Redis
 
   `Autenticação:` JWT
+
+  `Validação:` Class Validator
 
   `Documentação:` Open API 3.0 e SwaggerUI
 
@@ -140,10 +140,14 @@
       ```
 
     - **[GET] /entries/en/:word**
-      _ \*\*Descrição: Retorna as informações da palavra especificada e registra o histórico de acesso.
-      _ **Parâmetros:**
-      _ word: Palavra a ser consultada.
-      _ **Resposta:**
+
+      **Descrição:** Retorna as informações da palavra especificada e registra o histórico de acesso.
+
+      **Parâmetros:**
+
+      - `word`: Palavra a ser consultada.
+
+      **Resposta:**
 
       ```json
       {
@@ -161,41 +165,55 @@
 
     - **[POST] /entries/en/:word/favorite**
 
-      - **Descrição:** Salva a palavra na lista de favoritas do usuário.
-      - **Requisição:**
-        - Deve ser enviada com o token de autenticação no header.
-      - **Resposta:**
-        - Sucesso (código 204)
+      **Descrição:** Salva a palavra na lista de favoritas do usuário.
+
+      **Requisição:**
+
+      - Deve ser enviada com o token de autenticação no header.
+
+      **Resposta:**
+
+      - Sucesso (código 204)
 
     - **[DELETE] /entries/en/:word/unfavorite**
-    - **Descrição:** Remove a palavra da lista de favoritas do usuário.
-    - **Requisição:**
+      **Descrição:** Remove a palavra da lista de favoritas do usuário.
+
+      **Requisição:**
+
       - Deve ser enviada com o token de autenticação no header.
-    - **Resposta:**
+
+      **Resposta:**
+
       - Sucesso (código 204)
 
   - **4.3 Usuário**
 
   - **[GET] /user/me**
+    **Descrição:** Retorna o perfil do usuário autenticado.
 
-    - **Descrição:** Retorna o perfil do usuário autenticado.
-    - **Requisição:**
-      - Deve ser enviada com o token de autenticação no header.
-    - **Resposta:**
-      ```json
-      {
-        "id": "f3a10cec013ab2c1380acef",
-        "name": "User 1",
-        "email": "example@email.com"
-      }
-      ```
+    **Requisição:**
+
+    - Deve ser enviada com o token de autenticação no header.
+
+    **Resposta:**
+
+    ```json
+    {
+      "id": "f3a10cec013ab2c1380acef",
+      "name": "Jhon Doe",
+      "email": "jhondoe@email.com"
+    }
+    ```
 
   - **[GET] /user/me/history**
 
     - **Descrição:** Lista o histórico de palavras acessadas pelo usuário.
+
     - **Parâmetros:**
+
       - `limit`: Quantidade de resultados por página (opcional, padrão 10).
       - `page`: Página a ser exibida (opcional, padrão 1).
+
     - **Resposta:**
       ```json
       {
@@ -205,7 +223,7 @@
             "added": "2024-06-04T13:31:00.000Z"
           },
           {
-            "word": "your_searched_word",
+            "word": "fireman",
             "added": "2024-06-04T13:31:00.000Z"
           }
         ],
@@ -218,11 +236,15 @@
       ```
 
   - **[GET] /user/me/favorites**
-  - **Descrição:** Lista as palavras favoritas do usuário autenticado.
-  - **Parâmetros:**
+    **Descrição:** Lista as palavras favoritas do usuário autenticado.
+
+    **Parâmetros:**
+
     - `limit`: Quantidade de resultados por página (opcional, padrão 10).
     - `page`: Página a ser exibida (opcional, padrão 1).
-  - **Resposta:**
+
+    **Resposta:**
+
     ```json
     {
       "results": [],
@@ -248,7 +270,7 @@
 
 - **7. Diferencial 3 - Configuração Docker**
 
-  O projeto utiliza Docker para facilitar o deploy da API. Para mais informações sobre a configuração do Docker, consulte o arquivo `docker-compose.yml`.
+  O projeto utiliza Docker para facilitar o deploy da API. Para mais informações sobre a configuração do Docker, consulte o arquivo `docker-compose.yml` e `Dockerfile`.
 
 - **8. .gitignore**
 
@@ -256,11 +278,13 @@
 
 - **9. Projeto Pessoal no Github**
 
-  Este projeto foi desenvolvido como um desafio proposto pela plataforma Coders. Caso esteja utilizando um repositório pessoal no Github, lembre-se de mencionar o desafio na descrição do projeto.
+  Este projeto foi desenvolvido como um desafio proposto pela plataforma Coodesh. Caso esteja utilizando um repositório pessoal no Github, lembre-se de mencionar o desafio na descrição do projeto.
+
+  > This is a challenge by [Coodesh](https://coodesh.com/)
 
 - **10. Licença**
 
-  Este projeto ainda não possui uma licença definida. É recomendável escolher uma licença aberta e adequada para o seu projeto antes de publicá-lo em um repositório público.
+  Este projeto ainda não possui uma licença definida.
 
 - **11. Considerações Finais**
 
@@ -283,4 +307,4 @@
 
 - **15. Contato**
 
-  Para dúvidas, sugestões ou contribuições, entre em contato comigo pelo e-mail [[endereço de email removido]].
+  Para dúvidas, sugestões ou contribuições, entre em contato comigo pelo e-mail thiago.barreto.oliveira@gmail.com.
