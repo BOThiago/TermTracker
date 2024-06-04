@@ -69,7 +69,7 @@ export class WordService {
       }
 
       this.updateNewWord(cacheKey, fullWordData);
-      this.userService.addToHistory(cacheKey, userId);
+      this.userService.addToHistory(word, userId);
       return fullWordData;
     } catch (error) {
       throw new BadRequestException({

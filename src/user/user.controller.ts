@@ -4,10 +4,12 @@ import { UserService } from './user.service';
 import { UsuarioIdParam } from '../helpers/params-decorators.helper';
 import { CustomCacheInterceptor } from '../helpers/cacheHeader.interceptor';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { CacheTTL } from '@nestjs/cache-manager';
 
 @ApiTags('User')
 @UseGuards(JwtAuthGuard)
 @UseInterceptors(CustomCacheInterceptor)
+@CacheTTL(0)
 @Controller('user/me')
 export class UserController {
   constructor(private userService: UserService) {}
