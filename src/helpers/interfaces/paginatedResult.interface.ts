@@ -11,7 +11,7 @@ export class PaginatedResult<T> {
     return {
       results: pagination.results,
       totalDocs: pagination.totalDocs,
-      perPage: pagination.perPage,
+      perPage: Number(pagination.perPage),
       page: Number(pagination.page),
       totalPages: pagination.totalPages,
       hasNext: pagination.hasNext,
